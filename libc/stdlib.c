@@ -246,3 +246,50 @@ long long strtoll(const char* str, char** endptr, int base) {
     }
     return (long long)result;
 }
+
+long double strtold(const char* str, char** endptr) {
+    if (str == NULL) return 0;
+    while (isspace(*str)) str++;
+    bool neg = false;
+    if (*str == '-' || *str == '+') { neg = *str == '-' ? true : false; str++; }
+    int pred = __strtab(str);
+    pred = pred == 16 ? 16 : 10;
+    char* np;
+    if (pred == 16) str+=2;
+    long long A = strtoll(str, &np, pred);
+    long long B = 0;
+    long double frac = 0;
+    if (*np == '.') {
+        np++;
+        long double place = 1.0L / pred;
+        while (__strbch(*np, pred)) {
+            frac += __strdgt(*np, pred) * place;
+            place /= pred;
+            np++;
+        }
+    }
+    if (((*np == 'p' || *np == 'P') && pred == 16) || ((*np == 'e' || *np == 'E')) && pred == 10) {
+        char* op = np + 1;
+        B = strtoll(op, &np, 10);
+    }
+    long double base = (pred == 16) ? 2.0L : 10.0L;
+    long double result = frac + (long double)A;
+    for (long long i = 0; i < B; i++) {
+        result *= base;
+        if (result > 1e100L) { result = __builtin_huge_vall(); break; }
+    }
+    for (long long i = 0; i > B; i--) {
+        result /= base;
+        if (result < 1e-100L) { result = 0.0L; break; }
+    }
+    if (endptr) *endptr = np;
+    return neg ? -result : result;
+}
+
+double strtod(const char* str, char** endptr) {
+    return (double)strtold(str, endptr);
+}
+
+float strtof(const char* str, char** endptr) {
+    return (float)strtod(str, endptr);
+}
