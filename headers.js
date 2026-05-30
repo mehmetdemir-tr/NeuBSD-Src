@@ -120,7 +120,7 @@ var headers = [
 var impl = [];
 var notimpl = [];
 headers.forEach(element => {
-  if (fs.existsSync(`src/libc/include/${element["name"]}`)) {
+  if (fs.existsSync(`libc/include/${element["name"]}`)) {
     impl.push(element);
   } else {
     notimpl.push(element);
