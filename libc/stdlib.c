@@ -1,6 +1,10 @@
 #include "../libbridge/bridge.h"
 #include "include/stdlib.h"
 #include "include/string.h"
+#include "include/ctype.h"
+#include "include/limits.h"
+#include "include/stdbool.h"
+#include "include/errno.h"
 static void(*__at_exitarr[32])(void) = {0};
 static void(*__at_quickexitarr[32])(void) = {0};
 static int __at_exitcnt = 0;
@@ -159,4 +163,86 @@ size_t wcstombs(char* dest, const wchar_t* src, size_t max) {
     if (dest == NULL) return len;
     memcpy(dest, src, len);
     return len;
+}
+
+int __strtab(const char* str) {
+    if (str == NULL) return 10;
+    if (*str == '-' || *str == '+') str++;
+    if (*str == '\0') return 10;
+    if (*str == '0' && tolower((unsigned char)str[1]) == 'x') return 16;
+    if (*str == '0' && tolower((unsigned char)str[1]) == 'b') return 2; else if (*str == '0') return 8;
+    return 10;
+}
+bool __strbch(char ch, int base) {
+    ch = tolower((unsigned char)ch);
+    if (base <= 10) {
+        return '0' <= ch && ch < ('0' + base) && isdigit((unsigned char)ch);
+    } else {
+        return (isdigit((unsigned char)ch) || ('a' <= ch && ch < ('a' + base - 10))) && isalnum((unsigned char)ch);
+    }
+}
+int __strdgt(char ch, int base) {
+    ch = tolower((unsigned char)ch);
+    if (!(isalnum((unsigned char)ch))) return 0;
+    if (base <= 10 || ch <= '9') {
+        return ch - '0';
+    } else {
+        return ch - 'a' + 10;
+    }
+}
+unsigned long long strtoull(const char* str, char** endptr, int base) {
+    if (str == NULL) return 0;
+    while (isspace(*str)) str++;
+    bool neg = false;
+    if (*str == '-' || *str == '+') { neg = *str == '-' ? true : false; str++; }
+    int pred = __strtab(str);
+    if (base == 0) {
+        switch (pred) {
+            case 2: str += 2; break;
+            case 8: str += 1; break;
+            case 16: str += 2; break;
+        }
+        base = pred;
+    }
+    unsigned long long num = 0;
+    while (*str) {
+        if (__strbch(*str, base)) {
+            num = num * base + __strdgt(*str, base);
+            str++;
+        } else break;
+    }
+    if (endptr != NULL) *endptr = str;
+    return neg ? -num : num;
+}
+unsigned long strtoul(const char* str, char** endptr, int base) {
+    unsigned long long result = strtoull(str, endptr, base);
+    if (result > ULONG_MAX) {
+        errno = ERANGE;
+        return ULONG_MAX;
+    }
+    return (unsigned long)result;
+}
+long strtol(const char* str, char** endptr, int base) {
+    unsigned long long result = strtoull(str, endptr, base);
+    if ((long)result > LONG_MAX) {
+        errno = ERANGE;
+        return LONG_MAX;
+    }
+    if ((long)result < LONG_MIN) {
+        errno = ERANGE;
+        return LONG_MIN;
+    }
+    return (long)result;
+}
+long long strtoll(const char* str, char** endptr, int base) {
+    unsigned long long result = strtoull(str, endptr, base);
+    if ((long long)result > LLONG_MAX) {
+        errno = ERANGE;
+        return LLONG_MAX;
+    }
+    if ((long long)result < LLONG_MIN) {
+        errno = ERANGE;
+        return LLONG_MIN;
+    }
+    return (long long)result;
 }

@@ -53,3 +53,7 @@ int wctomb(char* pmb, wchar_t wc);
 size_t mbstowcs(wchar_t* dest, const char* src, size_t max);
 size_t wcstombs(char* dest, const wchar_t* src, size_t max);
 
+unsigned long long strtoull(const char* str, char** endptr, int base);
+unsigned long strtoul(const char* str, char** endptr, int base);
+long strtol(const char* str, char** endptr, int base);
+long long strtoll(const char* str, char** endptr, int base);
