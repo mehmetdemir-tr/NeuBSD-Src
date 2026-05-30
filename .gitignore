@@ -4,3 +4,4 @@ a.out
 *.out
 *.bin
 staging
+.DS_Store
