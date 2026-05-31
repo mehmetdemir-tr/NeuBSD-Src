@@ -196,6 +196,21 @@ int __strdgt(char ch, int base) {
         return ch - 'a' + 10;
     }
 }
+int __strncscmp(const char *str1, const char *str2, size_t n) {
+    if (str1 == NULL && str2 == NULL) return 0;
+    if (str1 == NULL) return -1;
+    if (str2 == NULL) return 1;
+    while(n--) {
+        int a = tolower((unsigned char)*str1++);
+        int b = tolower((unsigned char)*str2++);
+        if(a != b)
+    	    return a - b;
+        if (a == '\0')
+            return 0;
+    }
+    return 0;
+}
+
 unsigned long long strtoull(const char* str, char** endptr, int base) {
     if (str == NULL) return 0;
     while (isspace(*str)) str++;
@@ -258,6 +273,27 @@ long double strtold(const char* str, char** endptr) {
     while (isspace(*str)) str++;
     bool neg = false;
     if (*str == '-' || *str == '+') { neg = *str == '-' ? true : false; str++; }
+    if (__strncscmp(str, "nan", 3) == 0) {
+        if (*(str+3) == '(') {
+            str += 4;
+            while (*str && *str != ')') str++;
+            if (*str == ')') str++;
+        } else {
+            str += 3;
+            while (*str && (isalpha((unsigned char)*str) || isdigit((unsigned char)*str) || *str == '_')) str++;
+        }
+        if (endptr) *endptr = str;
+        long double result = __builtin_nanl("");
+        return neg ? -result : result;
+    } else if (__strncscmp(str, "infinity", 8) == 0) {
+        if (endptr) *endptr = str + 8;
+        long double result = __builtin_infl("");
+        return neg ? -result : result;
+    } else if (__strncscmp(str, "inf", 3) == 0) {
+        if (endptr) *endptr = str + 3;
+        long double result = __builtin_infl("");
+        return neg ? -result : result;
+    } 
     int pred = __strtab(str);
     pred = pred == 16 ? 16 : 10;
     char* np;
