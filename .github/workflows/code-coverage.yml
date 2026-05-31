@@ -14,8 +14,8 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
+      - name: Compile for coverage
+        run: make CFLAGS="-fprofile-arcs -ftest-coverage -O0"
 
       - name: Upload results to Codecov
         uses: codecov/codecov-action@v5
