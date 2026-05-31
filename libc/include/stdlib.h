@@ -1,5 +1,10 @@
 #pragma once
+#include <string.h>
+#include <stddef.h>
+
+#ifndef NULL
 #define NULL        ((void*)0)
+#endif
 #define MB_CUR_MAX  1
 
 typedef struct {
@@ -19,10 +24,10 @@ typedef struct {
 
 // ++ libbridge defs ++
 
-void abort(void);
+_Noreturn void abort(void);
 char* getenv(const char* name);
 int system(const char* command);
-void _Exit(int status);
+_Noreturn void _Exit(int status);
 
 int rand(void);
 void srand(unsigned int seed);
@@ -33,7 +38,7 @@ void* realloc(void* ptr, size_t size);
 
 int atexit(void (*func)(void));
 int at_quick_exit(void (*func)(void));
-void exit(int status)
+void exit(int status);
 _Noreturn void quick_exit(int status);
 
 void* calloc(size_t num, size_t size);
