@@ -287,11 +287,11 @@ long double strtold(const char* str, char** endptr) {
         return neg ? -result : result;
     } else if (__strncscmp(str, "infinity", 8) == 0) {
         if (endptr) *endptr = str + 8;
-        long double result = __builtin_infl("");
+        long double result = __builtin_huge_vall();
         return neg ? -result : result;
     } else if (__strncscmp(str, "inf", 3) == 0) {
         if (endptr) *endptr = str + 3;
-        long double result = __builtin_infl("");
+        long double result = __builtin_huge_vall();
         return neg ? -result : result;
     } 
     int pred = __strtab(str);
