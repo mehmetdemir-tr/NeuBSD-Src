@@ -316,3 +316,19 @@ double strtod(const char* str, char** endptr) {
 float strtof(const char* str, char** endptr) {
     return (float)strtod(str, endptr);
 }
+
+double atof(const char* str) {
+    return strtod(str, NULL);
+}
+
+int atoi(const char* str) {
+    return (int)strtol(str, NULL, 10);
+}
+
+long atol(const char* str) {
+    return strtol(str, NULL, 10);
+}
+
+long long atoll(const char* str) {
+    return strtoll(str, NULL, 10);
+}
