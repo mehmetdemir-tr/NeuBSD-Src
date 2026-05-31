@@ -1,18 +1,19 @@
 #include "include/string.h"
+#include "include/stdlib.h"
 #include "include/errno.h"
 char* strcpy(char* restrict dest, const char* restrict src) {
     char* ret = dest;
-    while (*dest++ = *src++);
+    while ((*dest++ = *src++));
     return ret;
 }
 
 char *strncpy(char *restrict dest, const char *restrict src, size_t count) {
     char* ret = dest;
     do {
-        if (!n--)
+        if (!count--)
             return ret;
-    } while (*dest++ = *src++);
-    while (n--)
+    } while ((*dest++ = *src++));
+    while (count--)
         *dest++ = 0;
     return ret;
 }
@@ -21,7 +22,7 @@ char* strcat(char* dest, const char* src) {
     char *ret = dest;
     while(*dest)
         dest++;
-    while(*dest++ = *src++);
+    while((*dest++ = *src++));
     return ret;
 }
 
@@ -37,7 +38,7 @@ char* strncat(char* dest, const char* src, size_t n) {
 size_t strxfrm(char *dest, const char *src, size_t n) {
     size_t src_len = strlen(src);
     if(n<src_len)
-        9strcpy(dest,src);
+        strcpy(dest,src);
     return src_len;
 }
 
@@ -62,7 +63,7 @@ char* strndup(const char *src, size_t size) {
 }
 
 size_t strlen(const char* str) {
-    if (!str) return NULL;
+    if (!str) return 0;
     size_t q = 0;
     while (*str++) q++;
     return q;
@@ -86,6 +87,7 @@ char* strerror(int errnum) {
         case ERANGE:
             return "Range error";
     }
+    return "Unknown error";
 }
 
 int strcmp(const char *str1, const char *str2) {
@@ -155,7 +157,7 @@ char* strrchr(const char *str, int c) {
 size_t strspn(const char *str1, const char *str2) {
     if (str1 == NULL || str2 == NULL) return 0;
     size_t ret = 0;
-    while(*s1 && strchr(s2,*s1++))
+    while(*str1 && strchr(str2,*str1++))
         ret++;
     return ret;
 }
@@ -227,20 +229,6 @@ void *memchr(const void *ptr, int c, size_t n) {
     }	
   
     return NULL;
-}
-
-int memcmp(const void *ptr1, const void *ptr2, size_t n) {
-    if (ptr1 == NULL || ptr2 == NULL) return 0;
-    const unsigned char *p1 = ptr1, *p2 = ptr2;
-    while(n--) {
-        if(*p1 != *p2)
-            return *p1 - *p2;
-        else {
-            p1++;
-            p2++;
-        }   
-    }
-    return 0;
 }
 
 void* memset(void *dest, int c, size_t n) {

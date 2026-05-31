@@ -5,3 +5,4 @@ a.out
 *.bin
 staging
 .DS_Store
+*.js

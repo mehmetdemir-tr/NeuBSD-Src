@@ -1,9 +1,11 @@
 #pragma once
 #define __STDC_VERSION_STRING_H__ 201112L
 
+#ifndef NULL
 #define NULL ((void*)0)
+#endif
 
-typedef typeof(sizeof(0)) size_t;
+typedef unsigned long long size_t;
 
 void* memcpy(void* restrict s1, const void* restrict s2, size_t n);
 void* memccpy(void* restrict s1, const void* restrict s2, int c, size_t n);

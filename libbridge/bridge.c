@@ -1,7 +1,7 @@
-void __bridge_process_exit(int status) {
+_Noreturn void __bridge_process_exit(int status) {
     
 }
-void __bridge_process_abort(void) {
+_Noreturn void __bridge_process_abort(void) {
 
 }
 

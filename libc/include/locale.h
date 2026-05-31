@@ -1,5 +1,4 @@
 #pragma once
-#warning "Locales are not supported in neulibc."
 struct lconv {
     char* decimal_point;        // "."
     char* thousands_sep;        // ""

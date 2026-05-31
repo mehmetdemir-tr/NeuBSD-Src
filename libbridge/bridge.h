@@ -3,8 +3,8 @@
 #define EXIT_FAILURE    1
 #define EXIT_SUCCESS    0
 
-void __bridge_process_exit(int status);
-void __bridge_process_abort(void);
+_Noreturn void __bridge_process_exit(int status);
+_Noreturn void __bridge_process_abort(void);
 
 void* __bridge_memory_allocate(unsigned long long size);
 void __bridge_memory_free(void* pointer);

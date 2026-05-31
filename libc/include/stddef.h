@@ -8,7 +8,8 @@ typedef char                wchar_t;
 typedef unsigned long long  size_t;
 typedef long long           ssize_t;
 
-
-#define NULL ((nullptr_t)0)
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
 #define unreachable() __builtin_unreachable()
 #define offsetof(P, D) ((size_t) &((P*)0)->D)

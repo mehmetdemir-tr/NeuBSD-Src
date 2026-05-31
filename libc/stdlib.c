@@ -10,7 +10,9 @@ static void(*__at_quickexitarr[32])(void) = {0};
 static int __at_exitcnt = 0;
 static int __at_quickexitcnt = 0;
 
-void abort(void) __bridge_process_abort();
+_Noreturn void abort(void) {
+    __bridge_process_abort();
+}
 
 char* getenv(const char* name) {
     return __bridge_execute_getenv(name);
@@ -20,13 +22,17 @@ int system(const char* command) {
     return __bridge_execute_command(command);
 }
 
-void _Exit(int status) __bridge_process_exit(status);
+_Noreturn void _Exit(int status) {
+    __bridge_process_exit(status);
+}
 
 int rand(void) {
     return __bridge_randgen_generate();
 }
 
-void srand(unsigned int seed) __bridge_randgen_seed(seed);
+void srand(unsigned int seed) {
+    __bridge_randgen_seed(seed);
+}
 
 void* realloc(void* ptr, size_t size) {
     if (ptr == NULL) {
@@ -119,7 +125,7 @@ long long llabs(long long n) {
     if (n < 0) return n*-1; else return n;
 }
 
-lldiv_t ldiv(long long number, long long denom) {
+lldiv_t lldiv(long long number, long long denom) {
     lldiv_t result = {
         number / denom,
         number % denom

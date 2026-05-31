@@ -32,7 +32,9 @@ static struct lconv __c_locale = {
     .int_p_sign_posn    = CHAR_MAX,
     .int_n_sign_posn    = CHAR_MAX
 };
-char* setlocale(int category, const char* locale) return locale;
+char* setlocale(int category, const char* locale) {
+    return locale;
+}
 struct lconv* localeconv(void) {
     return &__c_locale;
 }
