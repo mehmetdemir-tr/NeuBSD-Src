@@ -41,11 +41,11 @@ void* realloc(void* ptr, size_t size) {
         } else {
             return NULL;
         }
-    } else if (size == 0) {
+    }
+    if (size == 0) {
         __bridge_memory_free(ptr);
         return NULL;
     }
-    if (ptr == NULL || size == 0) return NULL;
     void* alloc = __bridge_memory_allocate(size);
     if (alloc == NULL) return NULL;
     memmove(alloc, ptr, size);
@@ -55,21 +55,21 @@ void* realloc(void* ptr, size_t size) {
 
 int atexit(void (*func)(void)) {
     if (!(__at_exitcnt <= 31)) return 1;
-    __at_exitarr[__at_exitcnt] = 0;
+    __at_exitarr[__at_exitcnt] = func;
     __at_exitcnt++;
     return 0;
 }
 
 int at_quick_exit(void (*func)(void)) {
     if (!(__at_quickexitcnt <= 31)) return 1;
-    __at_quickexitarr[__at_quickexitcnt] = 0;
+    __at_quickexitarr[__at_quickexitcnt] = func;
     __at_quickexitcnt++;
     return 0;
 }
 
 void exit(int status) {
     if (__at_exitcnt >= 32) __at_exitcnt = 31;
-    for (int i = __at_exitcnt - 1; i <= 0; i--) {
+    for (int i = __at_exitcnt - 1; i >= 0; i--) {
         if (__at_exitarr[i]) __at_exitarr[i]();
     }
     _Exit(status);
@@ -77,7 +77,7 @@ void exit(int status) {
 
 _Noreturn void quick_exit(int status) {
     if (__at_quickexitcnt >= 32) __at_quickexitcnt = 31;
-    for (int i = __at_quickexitcnt - 1; i <= 0; i--) {
+    for (int i = __at_quickexitcnt - 1; i >= 0; i--) {
         if (__at_quickexitarr[i]) __at_quickexitarr[i]();
     }
     _Exit(status);
@@ -237,34 +237,14 @@ unsigned long long strtoull(const char* str, char** endptr, int base) {
 }
 unsigned long strtoul(const char* str, char** endptr, int base) {
     unsigned long long result = strtoull(str, endptr, base);
-    if (result > ULONG_MAX) {
-        errno = ERANGE;
-        return ULONG_MAX;
-    }
     return (unsigned long)result;
 }
 long strtol(const char* str, char** endptr, int base) {
     unsigned long long result = strtoull(str, endptr, base);
-    if ((long)result > LONG_MAX) {
-        errno = ERANGE;
-        return LONG_MAX;
-    }
-    if ((long)result < LONG_MIN) {
-        errno = ERANGE;
-        return LONG_MIN;
-    }
     return (long)result;
 }
 long long strtoll(const char* str, char** endptr, int base) {
     unsigned long long result = strtoull(str, endptr, base);
-    if ((long long)result > LLONG_MAX) {
-        errno = ERANGE;
-        return LLONG_MAX;
-    }
-    if ((long long)result < LLONG_MIN) {
-        errno = ERANGE;
-        return LLONG_MIN;
-    }
     return (long long)result;
 }
 
@@ -310,7 +290,7 @@ long double strtold(const char* str, char** endptr) {
             np++;
         }
     }
-    if (((*np == 'p' || *np == 'P') && pred == 16) || ((*np == 'e' || *np == 'E')) && pred == 10) {
+    if (((*np == 'p' || *np == 'P') && pred == 16) || ((*np == 'e' || *np == 'E') && pred == 10)) {
         char* op = np + 1;
         B = strtoll(op, &np, 10);
     }
@@ -318,12 +298,13 @@ long double strtold(const char* str, char** endptr) {
     long double result = frac + (long double)A;
     for (long long i = 0; i < B; i++) {
         result *= base;
-        if (result > 1e100L) { result = __builtin_huge_vall(); break; }
+        if (result == __builtin_huge_vall()) break;
     }
     for (long long i = 0; i > B; i--) {
         result /= base;
-        if (result < 1e-100L) { result = 0.0L; break; }
+        if (result == 0.0L) break;
     }
+    if (result > 1e300) result = __builtin_huge_vall();
     if (endptr) *endptr = np;
     return neg ? -result : result;
 }
