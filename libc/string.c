@@ -8,11 +8,9 @@ char* strcpy(char* restrict dest, const char* restrict src) {
 }
 
 char *strncpy(char *restrict dest, const char *restrict src, size_t count) {
+    if (count == 0) return dest;
     char* ret = dest;
-    do {
-        if (!count--)
-            return ret;
-    } while ((*dest++ = *src++));
+    while (count && (*dest++ = *src++)) count--;
     while (count--)
         *dest++ = 0;
     return ret;
@@ -28,7 +26,7 @@ char* strcat(char* dest, const char* src) {
 
 char* strncat(char* dest, const char* src, size_t n) {
     char *ptr = dest + strlen(dest);
-    while(n--) {
+    while(n-- && *src) {
         *ptr++ = *src++;
     }
     *ptr = '\0';
@@ -36,10 +34,10 @@ char* strncat(char* dest, const char* src, size_t n) {
 }
 
 size_t strxfrm(char *dest, const char *src, size_t n) {
-    size_t src_len = strlen(src);
-    if(n<src_len)
-        strcpy(dest,src);
-    return src_len;
+    size_t len = strlen(src);
+    if (dest && n > 0)
+        strncpy(dest, src, n);
+    return len;
 }
 
 char* strdup(const char* src) {
@@ -122,8 +120,12 @@ int strncmp(const char *str1, const char *str2, size_t n) {
     if (str1 == NULL) return -1;
     if (str2 == NULL) return 1;
     while(n--) {
-        if(*str1++!=*str2++)
-    	    return *str1 - *str2;
+        unsigned char a = (unsigned char)*str1++;
+        unsigned char b = (unsigned char)*str2++;
+        if(a != b)
+    	    return a - b;
+        if (a == '\0')
+            return 0;
     }
     return 0;
 }
@@ -133,19 +135,19 @@ int strcoll(const char* s1, const char* s2) {
 }
 
 char* strchr(const char *str, int c) {
-    if (str == NULL) return 0;
+    if (str == NULL) return NULL;
     do {
-        if(*str == c) {
+        if(*str == (char)c) {
             return (char*)str;
         }
     } while (*str++);
     
-    return 0;
+    return NULL;
 }
 
 
 char* strrchr(const char *str, int c) {
-    if (str == NULL) return 0;
+    if (str == NULL) return NULL;
     char* ret = 0;
     do {
         if(*str == (char)c)
@@ -191,7 +193,7 @@ char* strpbrk(const char *str1, const char *str2) {
 char* strstr(const char *str1, const char *str2) {
     if (str1 == NULL || str2 == NULL) return NULL;
     size_t n = strlen(str2);
-
+    if (*str2 == '\0') return (char*)str1;
     while(*str1) {
         if(!memcmp(str1++, str2, n))
             return str1-1;
@@ -201,7 +203,7 @@ char* strstr(const char *str1, const char *str2) {
 }
 
 char* strtok(char *str, const char *delim) {
-    if (str == NULL || delim == NULL) return str;
+    if (delim == NULL) return str;
     static char* p=0;
 
     if(str)
@@ -241,23 +243,24 @@ void* memset(void *dest, int c, size_t n) {
 
 void *memcpy(void *dest, const void *src, size_t n) {
     if (dest == NULL || src == NULL) return dest;
-    char *d = dest;
-    const char *s = src;
+    unsigned char *d = dest;
+    const unsigned char *s = src;
     while(n--)
         *d++ = *s++;
     return dest;
 }
 
 void *memmove(void *dest, const void *src, size_t n) {
-    char *d = dest;
-    const char *s = src;
+    if (n == 0) return dest;
+    unsigned char *d = dest;
+    const unsigned char *s = src;
     if(d < s) {
         while(n--)
             *d++ = *s++;
     }
     else {
-        char *lasts = s + (n-1);
-        char *lastd = d + (n-1);
+        unsigned char *lasts = s + (n-1);
+        unsigned char *lastd = d + (n-1);
         while(n--)
             *lastd-- = *lasts--;
     }
